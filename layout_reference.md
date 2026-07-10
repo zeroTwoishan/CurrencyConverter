@@ -14,7 +14,7 @@ graph TD
     App -->|amount, options, selectCurrency, onAmountChange, onCurrencyChange| FromCard[From InputBox]
     App -->|convertedAmount, options, selectCurrency, placeholder, amountDisable| ToCard[To InputBox]
     App -->|onSwap function| SwapBtn[Swap.jsx Button]
-    App -->|convert function| Form[Form Submission]
+    App -->|loading, currencyInfo, from, to| InfoBanner[Live Rate Info Banner]
     
     App -.->|runs useEffect| Calculate[Real-Time Conversion Calculator]
 ```
@@ -85,6 +85,24 @@ function App() {
     selectCurrency={to}
     amountDisable
   />
+  ```
+* **Live Exchange Rate Info Banner**: Replaced the redundant "Convert" button at the bottom. Since the app updates values in real-time as you type, this banner dynamically displays the current 1-to-1 exchange rate ratio formatted to 4 decimal places, rendering a spinning loader during updates.
+  ```jsx
+  <div className="w-full bg-blue-600/10 border border-blue-500/20 text-blue-200 text-center py-3 px-4 rounded-lg font-semibold shadow-inner backdrop-blur-md mt-4 select-none">
+    {loading ? (
+      <span className="flex items-center justify-center gap-2">
+        <svg className="animate-spin h-4 w-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Fetching exchange rate...
+      </span>
+    ) : currencyInfo && currencyInfo[to] ? (
+      `1 ${from.toUpperCase()} = ${currencyInfo[to].toFixed(4)} ${to.toUpperCase()}`
+    ) : (
+      "Exchange rate unavailable"
+    )}
+  </div>
   ```
 
 ---
