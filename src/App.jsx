@@ -41,7 +41,7 @@ function App() {
       convert(); 
       }}>
       {error && (
-        <div className="w-full bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center py-2 px-3 rounded-lg mb-4 font-semibold">
+        <div className="w-full bg-red-600/90 border border-red-500/50 text-white text-xs text-center py-2.5 px-3 rounded-lg mb-4 font-semibold shadow-md flex items-center justify-center gap-1.5">
           ⚠️ Network Error: Using offline/stale rates.
         </div>
       )}

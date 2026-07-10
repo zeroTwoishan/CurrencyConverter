@@ -1,5 +1,7 @@
 # 💱 Premium Currency Converter
 
+🔗 **Live Demo**: [zerotwoishan.github.io/CurrencyConverter/](https://zerotwoishan.github.io/CurrencyConverter/)
+
 A modern, responsive, and highly interactive Currency Converter web application built using **React (v19)**, **Vite**, and **Tailwind CSS**. It fetches live, real-time exchange rates dynamically from a public currency API, featuring fluid animations, automatic calculation updates, error handling safeguards, and a premium glassmorphic UI.
 
 ---
