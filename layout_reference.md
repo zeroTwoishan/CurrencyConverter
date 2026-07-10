@@ -9,7 +9,7 @@ This document provides a comprehensive technical guide to the Currency Converter
 ```mermaid
 graph TD
     API[Fawaz Ahmed's Currency API] -->|fetch exchange rates| Hook[useCurrencyHook.js - useCurrencyHook]
-    API -->|fetch currency names| HookNames[useCurrencyHook.js - useCurrencyNames]
+    API -->|fetch currency names| HookNames[useCurrencyNames.js - useCurrencyNames]
     
     Hook -->|returns rates data, loading, error| App[App.jsx State Coordinator]
     HookNames -->|returns names list| App
@@ -114,15 +114,14 @@ function App() {
 
 ---
 
-## 2. Asynchronous Custom Hooks (`src/hook/currencyHook.js`)
+## 2. Asynchronous Custom Hooks (`src/hook/`)
 Manages asynchronous fetch states, loading transitions, and network errors.
 
-### Implementation
+### Exchange Rate Hook (`src/hook/currencyHook.js`)
 
 ```javascript
 import { useEffect, useState } from "react";
 
-// Fetch Exchange Rates relative to a base currency
 export function useCurrencyHook(currency) {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
@@ -155,9 +154,14 @@ export function useCurrencyHook(currency) {
 
     return { data, loading, error };
 }
+```
 
-// Fetch Full Descriptive Currency Names (run once on mount)
-export function useCurrencyNames() {
+### Currency Names Hook (`src/hook/useCurrencyNames.js`)
+
+```javascript
+import { useEffect, useState } from "react";
+
+function useCurrencyNames() {
     const [names, setNames] = useState({});
 
     useEffect(() => {
@@ -178,6 +182,8 @@ export function useCurrencyNames() {
 
     return names;
 }
+
+export default useCurrencyNames;
 ```
 
 ---
@@ -186,6 +192,8 @@ export function useCurrencyNames() {
 Splits the card into a left input field and a right dropdown list, handling accessibility, selection states, and focus events.
 
 ```jsx
+import React, { useId, useState } from 'react'
+
 function InputBox({
   label,
   amount,
@@ -200,6 +208,7 @@ function InputBox({
   currencyNames = {},
 }) {
   const amountInputId = useId();
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <div className={`w-full bg-white p-3.5 rounded-lg flex text-sm shadow-sm ${className}`}>
@@ -225,14 +234,21 @@ function InputBox({
       <div className="w-1/2 flex flex-col items-end justify-between text-right">
         <p className="text-black/40 mb-2 font-medium">Currency Type</p>
         <select
-          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700 w-36 text-ellipsis"
+          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700 max-w-full"
           value={selectCurrency}
-          onChange={(e) => onCurrencyChange && onCurrencyChange(e.target.value)}
+          onChange={(e) => {
+            onCurrencyChange && onCurrencyChange(e.target.value);
+            setIsFocused(false);
+          }}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           disabled={currencyDisable}
         >
           {currencyOptions.map((currency) => (
             <option key={currency} value={currency}>
-              {currency.toUpperCase()} {currencyNames[currency] ? `— ${currencyNames[currency]}` : ""}
+              {isFocused
+                ? `${currency.toUpperCase()} — ${currencyNames[currency] || ""}`
+                : currency.toUpperCase()}
             </option>
           ))}
         </select>
@@ -244,7 +260,9 @@ function InputBox({
 ```
 
 ### Key Technical Details:
-* **Hybrid Dropdown Rendering**: The dropdown renders both the short uppercase currency code and the full name (e.g. `USD — United States Dollar` or `INR — Indian Rupee`), making it incredibly clear to scan.
+* **Dynamic Option Rendering (Focus-based)**: Standard HTML `<select>` nodes display the selected option's text when collapsed. To prevent long text from overflowing and overlapping the amount inputs (e.g. `BTG — Bitcoin Gold`), we track the element's focus state with `isFocused`:
+  - When **collapsed** (`isFocused === false`): It displays only the short, 3-letter currency code (e.g. `USD`, `INR`).
+  - When **opened/focused** (`isFocused === true`): It dynamically shows the full name next to the code (e.g. `USD — United States Dollar`), helping users search and select.
 * **Empty Input Handling**: The `onChange` handler checks if the string is empty `e.target.value === "" ? ""` and returns an empty string, otherwise parsing it as a float. This prevents the number box from breaking or displaying annoying zero artifacts when clearing the input field.
 * **Auto-Select on Focus (`onFocus`)**: Runs `e.target.select()` on focus. When the user clicks or tabs into the amount field, it immediately selects the entire number, allowing them to overwrite it with their keyboard without having to manually backspace or select.
 
