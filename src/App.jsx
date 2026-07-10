@@ -29,15 +29,29 @@ function App() {
       
       {/* Header Section with Custom Icon */}
       <div className="flex flex-col items-center mb-6 text-center">
-        <div className="w-14 h-14 bg-blue-500/10 border border-blue-400/20 rounded-full flex items-center justify-center p-3 shadow-inner backdrop-blur-md mb-2">
-          <svg className="w-full h-full text-blue-400 animate-[spin_8s_linear_infinite]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+        <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center p-2.5 shadow-2xl backdrop-blur-md mb-3">
+          <svg className="w-full h-full animate-[spin_25s_linear_infinite]" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="logo-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#60a5fa" />
+                <stop offset="100%" stopColor="#a78bfa" />
+              </linearGradient>
+              <linearGradient id="logo-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#a78bfa" />
+                <stop offset="100%" stopColor="#f472b6" />
+              </linearGradient>
+            </defs>
+            <circle cx="256" cy="256" r="210" fill="none" stroke="url(#logo-grad1)" strokeWidth="32" strokeLinecap="round" strokeDasharray="900" strokeDashoffset="100" />
+            <path d="M 360 210 L 160 210 L 210 160 M 160 210 L 210 260" fill="none" stroke="url(#logo-grad2)" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M 152 302 L 352 302 L 302 252 M 352 302 L 302 352" fill="none" stroke="url(#logo-grad1)" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
+            <text x="195" y="240" fontFamily="system-ui, sans-serif" fontSize="130" fontWeight="bold" fill="#ffffff" textAnchor="middle">$</text>
+            <text x="317" y="325" fontFamily="system-ui, sans-serif" fontSize="130" fontWeight="bold" fill="#ffffff" textAnchor="middle">₹</text>
           </svg>
         </div>
-        <h1 className="text-xl font-bold text-white tracking-wide">
+        <h1 className="text-2xl font-bold text-white tracking-wide">
           Currency Converter
         </h1>
-        <p className="text-white/50 text-[11px] mt-0.5 font-medium">
+        <p className="text-white/60 text-xs mt-1 font-medium">
           Live Daily Exchange Rates
         </p>
       </div>
