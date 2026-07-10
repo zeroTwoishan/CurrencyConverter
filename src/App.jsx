@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { InputBox, Swap, Headers} from "./components/components"
-import useCurrencyHook, { useCurrencyNames } from "./hook/currencyHook";
+import { useCurrencyHook, useCurrencyNames } from "./hook/hooks";
 
 function App() {
   const [amount,setAmount] = useState("");
