@@ -7,8 +7,8 @@ function App() {
   const [from,setFrom] = useState("usd");
   const [to,setTo] = useState("inr");
   const [convertedAmount,setconvertedAmount] = useState(0);
-  const currencyInfo = useCurrencyHook(from);
-  const options = Object.keys(currencyInfo);
+  const { data: currencyInfo, loading, error } = useCurrencyHook(from);
+  const options = Object.keys(currencyInfo || {});
 
   const swap = () => {
     setFrom(to);
@@ -40,6 +40,12 @@ function App() {
       e.preventDefault();
       convert(); 
       }}>
+      {error && (
+        <div className="w-full bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center py-2 px-3 rounded-lg mb-4 font-semibold">
+          ⚠️ Network Error: Using offline/stale rates.
+        </div>
+      )}
+
       <InputBox
         label="From"
         amount={amount}
@@ -53,7 +59,8 @@ function App() {
 
       <InputBox
         label="To"
-        amount={convertedAmount}
+        amount={loading ? "" : convertedAmount}
+        placeholder={loading ? "Loading..." : "0"}
         currencyOptions={options}
         onCurrencyChange={(currency) => setTo(currency)}
         selectCurrency={to}

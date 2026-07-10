@@ -10,6 +10,7 @@ function InputBox({
   amountDisable = false,
   currencyDisable = false,
   className = "",
+  placeholder = "0",
 }) {
   // useId generates a unique ID for binding the label to the input element (useful for SEO/Accessibility)
   const amountInputId = useId();
@@ -24,7 +25,7 @@ function InputBox({
         <input
           id={amountInputId}
           type="number"
-          placeholder="0"
+          placeholder={placeholder}
           disabled={amountDisable}
           className="outline-hidden w-full bg-transparent py-1.5 text-base font-semibold text-gray-800"
           value={amount}
