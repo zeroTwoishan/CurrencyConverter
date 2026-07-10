@@ -28,7 +28,8 @@ function InputBox({
           disabled={amountDisable}
           className="outline-hidden w-full bg-transparent py-1.5 text-base font-semibold text-gray-800"
           value={amount}
-          onChange={(e) => onAmountChange && onAmountChange(Number(e.target.value))}
+          onChange={(e) => onAmountChange && onAmountChange(e.target.value === "" ? "" : Number(e.target.value))}
+          onFocus={(e) => e.target.select()}
         />
       </div>
 

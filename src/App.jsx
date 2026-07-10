@@ -3,7 +3,7 @@ import { InputBox, Swap, Headers} from "./components/components"
 import useCurrencyHook from "./hook/currencyHook";
 
 function App() {
-  const [amount,setAmount] = useState(0);
+  const [amount,setAmount] = useState("");
   const [from,setFrom] = useState("usd");
   const [to,setTo] = useState("inr");
   const [convertedAmount,setconvertedAmount] = useState(0);
@@ -19,7 +19,7 @@ function App() {
 
   const convert = () =>{
     if (currencyInfo && currencyInfo[to]) {
-      setconvertedAmount(amount * currencyInfo[to]);
+      setconvertedAmount(Number(amount) * currencyInfo[to]);
     }
   }
   return (
