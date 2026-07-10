@@ -225,7 +225,7 @@ function InputBox({
       <div className="w-1/2 flex flex-col items-end justify-between text-right">
         <p className="text-black/40 mb-2 font-medium">Currency Type</p>
         <select
-          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700 w-36 overflow-ellipsis"
+          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700 w-36 text-ellipsis"
           value={selectCurrency}
           onChange={(e) => onCurrencyChange && onCurrencyChange(e.target.value)}
           disabled={currencyDisable}
