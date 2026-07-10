@@ -8,11 +8,14 @@ This document provides a comprehensive technical guide to the Currency Converter
 
 ```mermaid
 graph TD
-    API[Fawaz Ahmed's Currency API] -->|fetch request| Hook[useCurrencyHook.js]
-    Hook -->|returns data, loading, error| App[App.jsx State Coordinator]
+    API[Fawaz Ahmed's Currency API] -->|fetch exchange rates| Hook[useCurrencyHook.js - useCurrencyHook]
+    API -->|fetch currency names| HookNames[useCurrencyHook.js - useCurrencyNames]
     
-    App -->|amount, options, selectCurrency, onAmountChange, onCurrencyChange| FromCard[From InputBox]
-    App -->|convertedAmount, options, selectCurrency, placeholder, amountDisable| ToCard[To InputBox]
+    Hook -->|returns rates data, loading, error| App[App.jsx State Coordinator]
+    HookNames -->|returns names list| App
+    
+    App -->|amount, options, currencyNames, selectCurrency, onAmountChange, onCurrencyChange| FromCard[From InputBox]
+    App -->|convertedAmount, options, currencyNames, selectCurrency, placeholder, amountDisable| ToCard[To InputBox]
     App -->|onSwap function| SwapBtn[Swap.jsx Button]
     App -->|loading, currencyInfo, from, to| InfoBanner[Live Rate Info Banner]
     
@@ -38,6 +41,9 @@ function App() {
   
   // Extract all currency option keys dynamically from the exchange rates object
   const options = Object.keys(currencyInfo || {});
+
+  // Fetch the descriptive names list once on mount
+  const currencyNames = useCurrencyNames();
 
   // Swaps From/To selections and their current numeric values
   const swap = () => {
@@ -69,7 +75,7 @@ function App() {
 * **Error Banner**: Renders conditionally when `error` is not null (e.g. if the user is offline or the rate API fails).
   ```jsx
   {error && (
-    <div className="w-full bg-red-500/10 border border-red-500/20 text-red-200 text-xs text-center py-2 px-3 rounded-lg mb-4 font-semibold">
+    <div className="w-full bg-red-600/90 border border-red-500/50 text-white text-xs text-center py-2.5 px-3 rounded-lg mb-4 font-semibold shadow-md flex items-center justify-center gap-1.5">
       ⚠️ Network Error: Using offline/stale rates.
     </div>
   )}
@@ -81,6 +87,7 @@ function App() {
     amount={loading ? "" : convertedAmount}
     placeholder={loading ? "Loading..." : "0"}
     currencyOptions={options}
+    currencyNames={currencyNames}
     onCurrencyChange={(currency) => setTo(currency)}
     selectCurrency={to}
     amountDisable
@@ -107,15 +114,16 @@ function App() {
 
 ---
 
-## 2. Custom Currency Hook (`src/hook/currencyHook.js`)
-An asynchronous custom React hook that manages fetch states, loading transitions, and network errors.
+## 2. Asynchronous Custom Hooks (`src/hook/currencyHook.js`)
+Manages asynchronous fetch states, loading transitions, and network errors.
 
 ### Implementation
 
 ```javascript
 import { useEffect, useState } from "react";
 
-function useCurrencyHook(currency) {
+// Fetch Exchange Rates relative to a base currency
+export function useCurrencyHook(currency) {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -141,16 +149,35 @@ function useCurrencyHook(currency) {
             .catch((err) => {
                 console.error("Error in useCurrencyHook:", err);
                 setError(err.message || "Failed to fetch exchange rates");
-                setData({}); // Clear stale data on failure
                 setLoading(false);
             });
     }, [currency]);
 
-    // Returns state package back to the App component
     return { data, loading, error };
 }
 
-export default useCurrencyHook;
+// Fetch Full Descriptive Currency Names (run once on mount)
+export function useCurrencyNames() {
+    const [names, setNames] = useState({});
+
+    useEffect(() => {
+        fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json")
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error("Failed to fetch currency names");
+                }
+                return res.json();
+            })
+            .then((res) => {
+                setNames(res);
+            })
+            .catch((err) => {
+                console.error("Error in useCurrencyNames:", err);
+            });
+    }, []);
+
+    return names;
+}
 ```
 
 ---
@@ -170,8 +197,8 @@ function InputBox({
   currencyDisable = false,
   className = "",
   placeholder = "0",
+  currencyNames = {},
 }) {
-  // useId generates a unique HTML ID for screen-reader and SEO accessibility
   const amountInputId = useId();
 
   return (
@@ -198,14 +225,14 @@ function InputBox({
       <div className="w-1/2 flex flex-col items-end justify-between text-right">
         <p className="text-black/40 mb-2 font-medium">Currency Type</p>
         <select
-          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700"
+          className="rounded-lg px-2 py-1 bg-gray-100 cursor-pointer outline-hidden hover:bg-gray-200 transition-colors font-semibold text-gray-700 w-36 overflow-ellipsis"
           value={selectCurrency}
           onChange={(e) => onCurrencyChange && onCurrencyChange(e.target.value)}
           disabled={currencyDisable}
         >
           {currencyOptions.map((currency) => (
             <option key={currency} value={currency}>
-              {currency}
+              {currency.toUpperCase()} {currencyNames[currency] ? `— ${currencyNames[currency]}` : ""}
             </option>
           ))}
         </select>
@@ -217,6 +244,7 @@ function InputBox({
 ```
 
 ### Key Technical Details:
+* **Hybrid Dropdown Rendering**: The dropdown renders both the short uppercase currency code and the full name (e.g. `USD — United States Dollar` or `INR — Indian Rupee`), making it incredibly clear to scan.
 * **Empty Input Handling**: The `onChange` handler checks if the string is empty `e.target.value === "" ? ""` and returns an empty string, otherwise parsing it as a float. This prevents the number box from breaking or displaying annoying zero artifacts when clearing the input field.
 * **Auto-Select on Focus (`onFocus`)**: Runs `e.target.select()` on focus. When the user clicks or tabs into the amount field, it immediately selects the entire number, allowing them to overwrite it with their keyboard without having to manually backspace or select.
 
@@ -252,7 +280,6 @@ function Headers() {
     <div className="flex flex-col items-center mb-6 text-center">
       <div className="w-20 h-20 bg-blue-600/10 border border-blue-500/20 rounded-full flex items-center justify-center p-2.5 shadow-inner backdrop-blur-md mb-3">
         <svg className="w-full h-full animate-[spin_25s_linear_infinite]" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-          {/* SVG paths represent a bold, high-contrast double arrow exchange */}
           <path d="M 120 190 H 380 M 310 120 L 380 190 L 310 260" fill="none" stroke="url(#header-logo-grad)" strokeWidth="56" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M 392 322 H 132 M 202 252 L 132 322 L 202 392" fill="none" stroke="url(#header-logo-grad)" strokeWidth="56" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
