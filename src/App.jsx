@@ -26,8 +26,23 @@ function App() {
     <>
     <div className="w-full h-screen flex flex-wrap justify-center items-center bg-financial">
     <div className="w-full max-w-md mx-auto border border-white/20 rounded-lg p-5 backdrop-blur-xs bg-white/10 shadow-2xl">
-    
-    <form onSubmit={(e) => { 
+      
+      {/* Header Section with Custom Icon */}
+      <div className="flex flex-col items-center mb-6 text-center">
+        <div className="w-14 h-14 bg-blue-500/10 border border-blue-400/20 rounded-full flex items-center justify-center p-3 shadow-inner backdrop-blur-md mb-2">
+          <svg className="w-full h-full text-blue-400 animate-[spin_8s_linear_infinite]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-white tracking-wide">
+          Currency Converter
+        </h1>
+        <p className="text-white/50 text-[11px] mt-0.5 font-medium">
+          Live Daily Exchange Rates
+        </p>
+      </div>
+
+      <form onSubmit={(e) => { 
       e.preventDefault();
       convert(); 
     }}>
