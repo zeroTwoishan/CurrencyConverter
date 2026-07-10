@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { InputBox, Swap, Headers} from "./components/components"
-import useCurrencyHook from "./hook/currencyHook";
+import useCurrencyHook, { useCurrencyNames } from "./hook/currencyHook";
 
 function App() {
   const [amount,setAmount] = useState("");
@@ -9,6 +9,7 @@ function App() {
   const [convertedAmount,setconvertedAmount] = useState(0);
   const { data: currencyInfo, loading, error } = useCurrencyHook(from);
   const options = Object.keys(currencyInfo || {});
+  const currencyNames = useCurrencyNames();
 
   const swap = () => {
     setFrom(to);
@@ -50,6 +51,7 @@ function App() {
         label="From"
         amount={amount}
         currencyOptions={options}
+        currencyNames={currencyNames}
         onCurrencyChange={(currency) => setFrom(currency)}
         selectCurrency={from}
         onAmountChange={(amount) => setAmount(amount)}
@@ -62,6 +64,7 @@ function App() {
         amount={loading ? "" : convertedAmount}
         placeholder={loading ? "Loading..." : "0"}
         currencyOptions={options}
+        currencyNames={currencyNames}
         onCurrencyChange={(currency) => setTo(currency)}
         selectCurrency={to}
         amountDisable

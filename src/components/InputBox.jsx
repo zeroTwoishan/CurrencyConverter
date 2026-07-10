@@ -11,6 +11,7 @@ function InputBox({
   currencyDisable = false,
   className = "",
   placeholder = "0",
+  currencyNames = {},
 }) {
   // useId generates a unique ID for binding the label to the input element (useful for SEO/Accessibility)
   const amountInputId = useId();
@@ -45,7 +46,7 @@ function InputBox({
         >
           {currencyOptions.map((currency) => (
             <option key={currency} value={currency}>
-              {currency}
+              {currency.toUpperCase()} {currencyNames[currency] ? `— ${currencyNames[currency]}` : ""}
             </option>
           ))}
         </select>
