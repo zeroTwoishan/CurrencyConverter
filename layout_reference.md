@@ -53,6 +53,19 @@ function App() {
     setAmount(convertedAmount);
   }
 
+  // Formats the exchange rate, auto-scaling precision for very small values
+  const formatRate = (rate) => {
+    if (!rate) return "0.00";
+    if (rate < 0.0001) {
+      let decimals = 6;
+      while (decimals <= 12 && Number(rate.toFixed(decimals)) === 0) {
+        decimals += 2;
+      }
+      return rate.toFixed(decimals);
+    }
+    return rate.toFixed(4);
+  }
+
   // Backup conversion method triggered on form submit
   const convert = () => {
     if (currencyInfo && currencyInfo[to]) {
@@ -93,7 +106,7 @@ function App() {
     amountDisable
   />
   ```
-* **Live Exchange Rate Info Banner**: Replaced the redundant "Convert" button at the bottom. Since the app updates values in real-time as you type, this banner dynamically displays the current 1-to-1 exchange rate ratio formatted to 4 decimal places, rendering a spinning loader during updates.
+* **Live Exchange Rate Info Banner**: Replaced the redundant "Convert" button at the bottom. Since the app updates values in real-time as you type, this banner dynamically displays the current 1-to-1 exchange rate ratio, utilizing `formatRate` to auto-scale decimals for small currencies (e.g., TRL to HNT).
   ```jsx
   <div className="w-full bg-blue-600/10 border border-blue-500/20 text-blue-200 text-center py-3 px-4 rounded-lg font-semibold shadow-inner backdrop-blur-md mt-4 select-none">
     {loading ? (
@@ -105,7 +118,7 @@ function App() {
         Fetching exchange rate...
       </span>
     ) : currencyInfo && currencyInfo[to] ? (
-      `1 ${from.toUpperCase()} = ${currencyInfo[to].toFixed(4)} ${to.toUpperCase()}`
+      `1 ${from.toUpperCase()} = ${formatRate(currencyInfo[to])} ${to.toUpperCase()}`
     ) : (
       "Exchange rate unavailable"
     )}
