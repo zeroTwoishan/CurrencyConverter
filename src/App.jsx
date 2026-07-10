@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { InputBox, Swap, Headers} from "./components/components"
 import useCurrencyHook from "./hook/currencyHook";
 
@@ -22,6 +22,13 @@ function App() {
       setconvertedAmount(Number(amount) * currencyInfo[to]);
     }
   }
+
+  // Automatically recalculate the conversion when rates, amounts, or currencies change
+  useEffect(() => {
+    if (currencyInfo && currencyInfo[to]) {
+      setconvertedAmount(Number(amount) * currencyInfo[to]);
+    }
+  }, [amount, from, to, currencyInfo]);
   return (
     <>
     <div className="w-full h-screen flex flex-wrap justify-center items-center bg-financial">
