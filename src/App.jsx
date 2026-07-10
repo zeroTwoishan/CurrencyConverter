@@ -18,6 +18,18 @@ function App() {
     setAmount(convertedAmount);
   }
 
+  const formatRate = (rate) => {
+    if (!rate) return "0.00";
+    if (rate < 0.0001) {
+      let decimals = 6;
+      while (decimals <= 12 && Number(rate.toFixed(decimals)) === 0) {
+        decimals += 2;
+      }
+      return rate.toFixed(decimals);
+    }
+    return rate.toFixed(4);
+  }
+
   const convert = () =>{
     if (currencyInfo && currencyInfo[to]) {
       setconvertedAmount(Number(amount) * currencyInfo[to]);
@@ -80,7 +92,7 @@ function App() {
             Fetching exchange rate...
           </span>
         ) : currencyInfo && currencyInfo[to] ? (
-          `1 ${from.toUpperCase()} = ${currencyInfo[to].toFixed(4)} ${to.toUpperCase()}`
+          `1 ${from.toUpperCase()} = ${formatRate(currencyInfo[to])} ${to.toUpperCase()}`
         ) : (
           "Exchange rate unavailable"
         )}
